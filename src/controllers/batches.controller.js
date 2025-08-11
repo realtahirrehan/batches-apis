@@ -4,7 +4,6 @@ import { Batches } from "../models/batches.js";
 
 export const createBatches = async (req, res) => {
     try {
-
         const { codes } = req.body;
         if (!codes || !Array.isArray(codes)) {
             return res.status(400).json({ message: 'Invalid batch data' });
@@ -45,7 +44,6 @@ export const getBatchById = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'Invalid Batch ID format' });
         }
-
 
         const batch = await Batches.findById(id);
         if (!batch) {
