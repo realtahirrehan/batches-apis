@@ -1,0 +1,60 @@
+import mongoose from "mongoose";
+import { Batches } from "../models/batches.js";
+
+
+export const createBatches = async (req, res) => {
+    try {
+
+        const { codes } = req.body;
+        if (!codes || !Array.isArray(codes)) {
+            return res.status(400).json({ message: 'Invalid batch data' });
+        }
+
+        const newBatch = new Batches({ codes });
+        await newBatch.save();
+
+        res.status(201).json({ message: 'Batch created successfully', data: newBatch });
+    } catch (error) {
+        console.error('Error creating batch:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+
+export const getBatches = async (req, res) => {
+    try {
+        const batches = await Batches.find();
+        if (!batches || batches.length === 0) {
+            return res.status(404).json({ message: 'No batches found' });
+        }
+
+        res.status(200).json({ message: 'Batches retrieved successfully', data: batches });
+    } catch (error) {
+        console.error('Error retrieving batches:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+export const getBatchById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ message: 'Batch ID is required' });
+        }
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid Batch ID format' });
+        }
+
+
+        const batch = await Batches.findById(id);
+        if (!batch) {
+            return res.status(404).json({ message: 'Batch not found' });
+        }
+
+        res.status(200).json({ message: 'Batch retrieved successfully', data: batch });
+    } catch (error) {
+        console.error('Error retrieving batch:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
