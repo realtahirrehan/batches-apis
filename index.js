@@ -17,7 +17,7 @@ const app = express();
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
