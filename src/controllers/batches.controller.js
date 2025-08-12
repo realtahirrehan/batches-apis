@@ -1,20 +1,30 @@
 import mongoose from "mongoose";
 import { Batches } from "../models/batches.js";
 
-
 export const createBatches = async (req, res) => {
     try {
-        const { codes } = req.body;
+        const { codes, product_name, product_description, quantity } = req.body;
         if (!codes || !Array.isArray(codes)) {
             return res.status(400).json({ message: 'Invalid batch data' });
         }
 
-        const newBatch = new Batches({ codes });
+        const existing = await Batches.findOne({ codes: { $in: codes } });
+        if (existing) {
+            const existingCodes = existing?.codes.filter(code =>
+                codes.includes(code)
+            );
+            return res.status(400).json({ message: 'These codes already exist in another batch.', data: existingCodes || existing.codes });
+        }
+
+        const newBatch = new Batches({ codes, product_name, product_description, quantity });
         await newBatch.save();
 
         res.status(201).json({ message: 'Batch created successfully', data: newBatch });
     } catch (error) {
         console.error('Error creating batch:', error);
+        if (error.code === 11000) {
+            return res.status(400).json({ message: `Batch with these codes already exists: ${error.keyValue.codes}` });
+        }
         res.status(500).json({ message: 'Internal Server Error' });
     }
 }

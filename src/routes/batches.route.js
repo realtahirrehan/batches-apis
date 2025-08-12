@@ -78,6 +78,16 @@ router.get('/batches/:id', getBatchById);
  *                 type: array
  *                 items:
  *                   type: string
+ *                 required: true
+ *               product_name:
+ *                 type: string
+ *                 required: true
+ *               product_description:
+ *                 type: string
+ *                 required: true
+ *               quantity:
+ *                 type: number
+ *                 required: true
  *     responses:
  *       201:
  *         description: Batch created successfully
