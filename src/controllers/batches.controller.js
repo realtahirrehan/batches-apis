@@ -8,12 +8,23 @@ export const createBatches = async (req, res) => {
             return res.status(400).json({ message: 'Invalid batch data' });
         }
 
-        const existing = await Batches.findOne({ codes: { $in: codes } });
-        if (existing) {
-            const existingCodes = existing?.codes.filter(code =>
-                codes.includes(code)
-            );
-            return res.status(400).json({ message: 'These codes already exist in another batch.', data: existingCodes || existing.codes });
+        const existingBatches = await Batches.find({ codes: { $in: codes } });
+        if (existingBatches.length > 0) {
+            const existingCodes = new Set();
+            existingBatches.forEach(batch => {
+                batch.codes.forEach(code => {
+                    if (codes.includes(code)) {
+                        existingCodes.add(code);
+                    }
+                });
+            });
+
+            if (existingCodes.size > 0) {
+                return res.status(400).json({
+                    message: 'These codes already exist in other batches.',
+                    data: Array.from(existingCodes)
+                });
+            }
         }
 
         const newBatch = new Batches({ codes, product_name, product_description, quantity });
